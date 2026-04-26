@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz Battle</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      background-color: #eef4ff;
+      font-family: Arial, Helvetica, sans-serif;
+      position: relative;
+    }
+
+    .app-shell {
+      padding-top: 25px;
+      padding-bottom: 25px;
+    }
+
+    .screen-wrap {
+      max-width: 850px;
+      margin: 0 auto;
+      scroll-margin-top: 90px;
+    }
+
+    .card {
+      border-radius: 12px;
+    }
+
+    .battle-slide {
+      min-height: 220px;
+    }
+
+    .battle-slide-1 { background-color: #0d6efd; }
+    .battle-slide-2 { background-color: #198754; }
+    .battle-slide-3 { background-color: #dc3545; }
+
+    .battle-slide-content {
+      min-height: 220px;
+      padding: 40px 55px;
+    }
+
+    .option-btn {
+      min-height: 55px;
+      text-align: left;
+    }
+
+    .option-btn.correct {
+      background-color: #198754;
+      color: white;
+      border-color: #198754;
+    }
+
+    .option-btn.wrong {
+      background-color: #dc3545;
+      color: white;
+      border-color: #dc3545;
+    }
+
+    @media (max-width: 600px) {
+      .battle-slide-content {
+        padding: 30px;
+      }
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body data-bs-spy="scroll" data-bs-target="#mainNavbar" data-bs-offset="70">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#lobby" onclick="quitGame()">Quiz Battle</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" href="#lobby" onclick="quitGame()">Lobby</a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Categories
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="chooseCategory('general')">General Knowledge</a></li>
+            <li><a class="dropdown-item" href="#" onclick="chooseCategory('science')">Science</a></li>
+            <li><a class="dropdown-item" href="#" onclick="chooseCategory('sports')">Sports</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Game
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" onclick="startGame()">Start New Battle</a></li>
+            <li><a class="dropdown-item" href="#" onclick="restartGame()">Back to Lobby</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" onclick="quitGame()">Quit Game</a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
+            Help
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#how-to-play">
+            How to Play
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="#about">
+            About
+          </a>
+        </li>
+      </ul>
+
+      <button class="btn btn-warning fw-bold px-4" type="button" onclick="startGame()" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="bottom" data-bs-title="Quick Start" data-bs-content="Starts a new quiz battle using the names and category currently selected in the lobby.">Start Battle</button>
+    </div>
+  </div>
+</nav>
+
+<div class="container app-shell">
+
+  <div id="lobby" class="screen-wrap">
+    <div id="battleCarousel" class="carousel slide mx-auto mb-4 shadow rounded overflow-hidden" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#battleCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#battleCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#battleCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      </div>
+
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <div class="battle-slide battle-slide-1 text-white">
+            <div class="battle-slide-content d-flex flex-column justify-content-center">
+              <span class="badge bg-warning text-dark align-self-start mb-3">Quiz Battle</span>
+              <h2 class="fw-bold mb-2">Challenge a Friend</h2>
+              <p class="fs-5 mb-0">Pick your players, choose a category, and race through fast questions for the highest score.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <div class="battle-slide battle-slide-2 text-white">
+            <div class="battle-slide-content d-flex flex-column justify-content-center">
+              <span class="badge bg-light text-success align-self-start mb-3">Speed Bonus</span>
+              <h2 class="fw-bold mb-2">Answer Before Time Runs Out</h2>
+              <p class="fs-5 mb-0">Correct answers earn points, and quick thinking adds a bonus to your total.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <div class="battle-slide battle-slide-3 text-white">
+            <div class="battle-slide-content d-flex flex-column justify-content-center">
+              <span class="badge bg-light text-danger align-self-start mb-3">Winner Takes It</span>
+              <h2 class="fw-bold mb-2">Six Rounds, One Champion</h2>
+              <p class="fs-5 mb-0">Take turns, watch the scoreboard, and see who owns the final round.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#battleCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#battleCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+
+    <div class="card shadow mx-auto" style="max-width: 480px;">
+      <div class="card-header bg-primary text-white text-center">
+        <h2 class="mb-0">Quiz Battle</h2>
+        <small>2 Players / 1 Winner</small>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label fw-bold">Player 1 Name</label>
+          <input type="text" id="p1name" class="form-control" value="Alice" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-bold">Player 2 Name</label>
+          <input type="text" id="p2name" class="form-control" value="Bob" />
+        </div>
+        <div class="mb-4">
+          <label class="form-label fw-bold">Category</label>
+          <select id="category" class="form-select" data-bs-toggle="popover" data-bs-trigger="hover focus" data-bs-placement="right" data-bs-title="Pick a Topic" data-bs-content="Choose the question category before starting the battle.">
+            <option value="general">General Knowledge</option>
+            <option value="science">Science</option>
+            <option value="sports">Sports</option>
+          </select>
+        </div>
+        <button class="btn btn-primary w-100 btn-lg" onclick="startGame()">
+          Start Battle
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="game" class="d-none screen-wrap">
+
+    <div class="row mb-4 text-center align-items-center">
+      <div class="col-5">
+        <div class="card border-primary shadow-sm">
+          <div class="card-body py-2">
+            <h5 id="p1-name" class="text-primary mb-1">Alice</h5>
+            <h2 id="p1-score" class="text-primary mb-0">0</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-2 d-flex align-items-center justify-content-center">
+        <span class="fw-bold text-muted fs-5">VS</span>
+      </div>
+      <div class="col-5">
+        <div class="card border-danger shadow-sm">
+          <div class="card-body py-2">
+            <h5 id="p2-name" class="text-danger mb-1">Bob</h5>
+            <h2 id="p2-score" class="text-danger mb-0">0</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mb-3">
+      <span class="badge bg-secondary fs-6">Round <span id="round-num">1</span> of 6</span>
+      <div id="turn-badge" class="mt-2">
+        <span class="badge bg-primary fs-6">Alice's Turn</span>
+      </div>
+    </div>
+
+    <div class="card shadow-sm p-3 d-flex flex-row align-items-center gap-3 mb-3">
+      <span class="fw-bold text-nowrap">Time</span>
+      <div class="progress flex-grow-1" style="height: 16px;">
+        <div id="timer-bar" class="progress-bar bg-success" style="width: 100%;"></div>
+      </div>
+      <span id="timer-val" class="fw-bold fs-5">15</span>
+    </div>
+
+    <div class="card shadow mb-3">
+      <div class="card-body">
+        <p class="text-primary text-uppercase fw-bold small mb-2" id="q-cat">General Knowledge</p>
+        <h4 id="q-text" class="card-title fw-bold mb-0">Question goes here</h4>
+      </div>
+    </div>
+
+    <div class="row g-2 mb-3" id="options">
+      <div class="col-12 col-md-6"><button class="btn btn-outline-dark option-btn w-100" id="opt0" onclick="answer(0)">A. Option</button></div>
+      <div class="col-12 col-md-6"><button class="btn btn-outline-dark option-btn w-100" id="opt1" onclick="answer(1)">B. Option</button></div>
+      <div class="col-12 col-md-6"><button class="btn btn-outline-dark option-btn w-100" id="opt2" onclick="answer(2)">C. Option</button></div>
+      <div class="col-12 col-md-6"><button class="btn btn-outline-dark option-btn w-100" id="opt3" onclick="answer(3)">D. Option</button></div>
+    </div>
+
+    <div id="feedback" class="alert d-none text-center fw-bold" role="alert"></div>
+
+    <div class="text-center">
+      <button class="btn btn-outline-secondary btn-sm" onclick="quitGame()">✕ Quit Game</button>
+    </div>
+  </div>
+
+  <div id="result" class="d-none screen-wrap">
+    <div class="card shadow text-center mx-auto" style="max-width: 460px;">
+      <div class="card-header bg-warning text-dark border-0 py-4">
+        <h3 class="mb-0 fw-bold">Game Over!</h3>
+      </div>
+      <div class="card-body p-4">
+        <p id="winner-text" class="fs-4 fw-bold mb-3">Alice Wins!</p>
+        <div class="row text-center mb-4">
+          <div class="col-6">
+            <div class="bg-primary text-white rounded p-3">
+              <div id="r-p1-name" class="fw-bold">Alice</div>
+              <div id="r-p1-score" class="fs-2 fw-bold">0</div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="bg-danger text-white rounded p-3">
+              <div id="r-p2-name" class="fw-bold">Bob</div>
+              <div id="r-p2-score" class="fs-2 fw-bold">0</div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-warning w-100 fw-bold" onclick="restartGame()">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="how-to-play" class="screen-wrap">
+    <h2>How to Play Quiz Battle</h2>
+    <p>Quiz Battle is a fast-paced quiz game for two players...</p>
+    <ul>
+      <li>Beat the timer to earn bonus points</li>
+      <li>Answer correctly to score</li>
+      <li>Play 6 rounds to determine the winner</li>
+    </ul>
+  </div>
+
+  <div id="about" class="screen-wrap">
+    <h2>About</h2>
+    <p>This is a Bootstrap-based quiz application...</p>
+  </div>
+
+</div>
+
+<div id="loader" class="position-fixed top-0 start-0 w-100 vh-100 bg-white bg-opacity-75 d-none d-flex justify-content-center align-items-center">
+  <div class="text-center">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <h5 class="text-primary">Loading Quiz...</h5>
+  </div>
+</div>
+
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title" id="helpModalLabel">How to Play</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">
+            <strong>Beat the Timer:</strong> Answer before the countdown reaches zero.
+          </li>
+          <li class="list-group-item">
+            <strong>Score Bonus:</strong> Correct answers earn 100 points plus a time bonus.
+          </li>
+          <li class="list-group-item">
+            <strong>Win the Battle:</strong> The highest score after 6 rounds wins the game.
+          </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let mainScrollSpy;
+
+document.addEventListener('DOMContentLoaded', () => {
+  const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+  [...popoverTriggerList].forEach((popoverTriggerEl) => new bootstrap.Popover(popoverTriggerEl));
+
+  mainScrollSpy = bootstrap.ScrollSpy.getOrCreateInstance(document.body, {
+    target: '#mainNavbar',
+    offset: 90
+  });
+});
+
+const QUESTIONS = {
+  general: [
+    { q: "What is the capital of France?",         opts: ["London","Paris","Rome","Berlin"],        ans: 1 },
+    { q: "How many days are in a leap year?",      opts: ["364","365","366","367"],                 ans: 2 },
+    { q: "Which planet is closest to the Sun?",    opts: ["Venus","Earth","Mars","Mercury"],        ans: 3 },
+    { q: "Who painted the Mona Lisa?",             opts: ["Picasso","Da Vinci","Van Gogh","Monet"], ans: 1 },
+    { q: "What is the largest ocean?",             opts: ["Atlantic","Indian","Arctic","Pacific"],  ans: 3 },
+    { q: "How many sides does a hexagon have?",    opts: ["5","6","7","8"],                         ans: 1 },
+  ],
+  science: [
+    { q: "What is the chemical symbol for water?", opts: ["WO","H2O","HO2","W2O"],                 ans: 1 },
+    { q: "What gas do plants absorb?",             opts: ["Oxygen","Nitrogen","CO2","Hydrogen"],    ans: 2 },
+    { q: "What is the powerhouse of the cell?",    opts: ["Nucleus","Ribosome","Mitochondria","Golgi"], ans: 2 },
+    { q: "How many bones in the human body?",      opts: ["196","206","216","226"],                 ans: 1 },
+    { q: "What planet is the Red Planet?",         opts: ["Venus","Jupiter","Saturn","Mars"],       ans: 3 },
+    { q: "What is the symbol for Gold?",           opts: ["Go","Gd","Au","Ag"],                     ans: 2 },
+  ],
+  sports: [
+    { q: "How many players in a football team?",   opts: ["9","10","11","12"],                      ans: 2 },
+    { q: "How many Grand Slams in tennis per year?",opts: ["2","3","4","5"],                        ans: 2 },
+    { q: "Which country won the most World Cups?", opts: ["Germany","Argentina","Brazil","Italy"],  ans: 2 },
+    { q: "How long is a marathon?",                opts: ["40km","41km","42.195km","44km"],          ans: 2 },
+    { q: "Which sport uses a shuttlecock?",        opts: ["Tennis","Squash","Badminton","Golf"],    ans: 2 },
+    { q: "How many rings on the Olympic flag?",    opts: ["4","5","6","7"],                         ans: 1 },
+  ]
+};
+
+let p1, p2, s1, s2, round, questions, currentQ, answered, timerInterval, timeLeft, currentPlayer;
+
+function startGame() {
+  showLoader();
+
+  p1 = document.getElementById('p1name').value || 'Player 1';
+  p2 = document.getElementById('p2name').value || 'Player 2';
+  const cat = document.getElementById('category').value;
+  s1 = 0; s2 = 0; round = 0; currentPlayer = 1;
+
+  questions = [...QUESTIONS[cat]].sort(() => Math.random() - 0.5);
+
+  document.getElementById('p1-name').textContent = p1;
+  document.getElementById('p2-name').textContent = p2;
+  document.getElementById('p1-score').textContent = 0;
+  document.getElementById('p2-score').textContent = 0;
+
+  setTimeout(() => {
+    hideLoader();
+    show('game');
+    loadQuestion();
+  }, 800);
+}
+
+function loadQuestion() {
+  if (round >= questions.length) { endGame(); return; }
+
+  answered = false;
+  currentQ = questions[round];
+  round++;
+
+  // Update round & turn
+  document.getElementById('round-num').textContent = round;
+  const name = currentPlayer === 1 ? p1 : p2;
+  const color = currentPlayer === 1 ? 'bg-primary' : 'bg-danger';
+  document.getElementById('turn-badge').innerHTML =
+    `<span class="badge ${color} fs-6">${name}'s Turn</span>`;
+
+  // Set question
+  const catLabel = document.getElementById('category').options[document.getElementById('category').selectedIndex].text;
+  document.getElementById('q-cat').textContent = catLabel;
+  document.getElementById('q-text').textContent = currentQ.q;
+
+  // Set options
+  const labels = ['A','B','C','D'];
+  for (let i = 0; i < 4; i++) {
+    const btn = document.getElementById('opt' + i);
+    btn.textContent = labels[i] + '. ' + currentQ.opts[i];
+    btn.className = 'btn btn-outline-dark option-btn w-100';
+    btn.disabled = false;
+  }
+
+  // Hide feedback
+  const fb = document.getElementById('feedback');
+  fb.classList.add('d-none');
+
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timeLeft = 10;
+  updateTimerUI();
+
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimerUI();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      if (!answered) timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  document.getElementById('timer-val').textContent = timeLeft;
+  const pct = (timeLeft / 10) * 100;
+  const bar = document.getElementById('timer-bar');
+  bar.style.width = pct + '%';
+  bar.className = 'progress-bar ' + (pct > 50 ? 'bg-success' : pct > 25 ? 'bg-warning' : 'bg-danger');
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timerInterval);
+
+  const correct = currentQ.ans;
+  for (let i = 0; i < 4; i++) document.getElementById('opt' + i).disabled = true;
+
+  const fb = document.getElementById('feedback');
+
+  if (idx === correct) {
+    document.getElementById('opt' + idx).classList.add('correct');
+    const pts = 100 + timeLeft * 5;
+    if (currentPlayer === 1) { s1 += pts; document.getElementById('p1-score').textContent = s1; }
+    else                     { s2 += pts; document.getElementById('p2-score').textContent = s2; }
+    fb.className = 'alert alert-success fw-bold text-center';
+    fb.textContent = '✅ Correct! +' + pts + ' points';
+  } else {
+    document.getElementById('opt' + idx).classList.add('wrong');
+    document.getElementById('opt' + correct).classList.add('correct');
+    fb.className = 'alert alert-danger fw-bold text-center';
+    fb.textContent = '❌ Wrong! The answer was: ' + currentQ.opts[correct];
+  }
+
+  fb.classList.remove('d-none');
+  currentPlayer = currentPlayer === 1 ? 2 : 1;
+  setTimeout(loadQuestion, 1800);
+}
+
+function timeOut() {
+  answered = true;
+  document.getElementById('opt' + currentQ.ans).classList.add('correct');
+  for (let i = 0; i < 4; i++) document.getElementById('opt' + i).disabled = true;
+  const fb = document.getElementById('feedback');
+  fb.className = 'alert alert-warning fw-bold text-center';
+  fb.textContent = "⏱ Time's up!";
+  fb.classList.remove('d-none');
+  currentPlayer = currentPlayer === 1 ? 2 : 1;
+  setTimeout(loadQuestion, 1800);
+}
+
+function endGame() {
+  clearInterval(timerInterval);
+  document.getElementById('r-p1-name').textContent = p1;
+  document.getElementById('r-p2-name').textContent = p2;
+  document.getElementById('r-p1-score').textContent = s1;
+  document.getElementById('r-p2-score').textContent = s2;
+
+  let msg;
+  if (s1 > s2)      msg = '🏆 ' + p1 + ' Wins!';
+  else if (s2 > s1) msg = '🏆 ' + p2 + ' Wins!';
+  else              msg = "🤝 It's a Draw!";
+
+  document.getElementById('winner-text').textContent = msg;
+  show('result');
+}
+
+function restartGame() { show('lobby'); }
+function quitGame()    { clearInterval(timerInterval); show('lobby'); }
+
+function chooseCategory(category) {
+  document.getElementById('category').value = category;
+  quitGame();
+}
+
+function showLoader() {
+  document.getElementById('loader').classList.remove('d-none');
+}
+
+function hideLoader() {
+  document.getElementById('loader').classList.add('d-none');
+}
+
+function show(screen) {
+  document.getElementById('lobby').classList.add('d-none');
+  document.getElementById('game').classList.add('d-none');
+  document.getElementById('result').classList.add('d-none');
+  const activeScreen = document.getElementById(screen);
+  activeScreen.classList.remove('d-none');
+  activeScreen.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  if (mainScrollSpy) {
+    mainScrollSpy.refresh();
+  }
+}
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
